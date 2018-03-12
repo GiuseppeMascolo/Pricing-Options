@@ -30,7 +30,7 @@ int main(int argc, char** argv)
     double T = 1;       //time to maturity
     //double B = 130;     //border price (for border options)
     
-    long N = 52;        //time steps
+    long N = 100;        //time steps
     long M = 1000000;   //Monte Carlo repetitions
     
     double s_time = std::clock();
@@ -41,8 +41,9 @@ int main(int argc, char** argv)
     
     double discount = std::exp(-r*T);  //discount factor to discount the option
     
-    double sum_v = 0.0;    //to add on the option payoffs
-    double sum_v_2 = 0.0;
+    double sum_payoff = 0.0;    //to add on the option payoffs
+    double sum_payoff_2 = 0.0;
+    
     
     for(long j = 0; j != M; ++j)    //for each path
     {
@@ -50,11 +51,13 @@ int main(int argc, char** argv)
         
         //bool knocked_out = false;
         double path_S = S0;
+        double sum = S0;           //to add values of path_S
 
         for(long i = 1; i <= N; ++i)    //for each time step
         {
             
             path_S = Next_S(path_S, drift_dt, sig_rt);    //update the next value of S
+            sum += path_S;
             /*
             if(path_S >= B)
             {
@@ -64,16 +67,21 @@ int main(int argc, char** argv)
             */          
         }
         
-        double v = my_max(0.0, path_S - X);
-        //double v = knocked_out ? 0.0 : my_max(path_S - X, 0.0);  //payoff
+        sum /= N;
         
-        sum_v += v;
-        sum_v_2 += v*v;
+        //double payoff = my_max(0.0, path_S - X);    // plain call
+        double payoff = my_max(0.0, sum - X);       // average rate call
+        //double payoff = my_max(0.0, X - path_S);    // plain put
+        //double payoff = my_max(0.0, X - sum);       // average rate put
+        //double payoff = knocked_out ? 0.0 : my_max(path_S - X, 0.0);  // barrier
+        
+        sum_payoff += payoff;
+        sum_payoff_2 += payoff*payoff;
     }
     
     //outputs
-    double c = discount*sum_v/M;    //option value
-    double se = discount*std::sqrt(sum_v_2 - sum_v*sum_v/M)/M;    //standard error
+    double c = discount*sum_payoff/M;    //option value
+    double se = discount*std::sqrt(sum_payoff_2 - sum_payoff*sum_payoff/M)/M;    //standard error
     
     double e_time = (std::clock() - s_time)/CLOCKS_PER_SEC;
     
