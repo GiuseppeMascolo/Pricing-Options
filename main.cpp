@@ -2,6 +2,8 @@
 //  MC_plain
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
+#include "OptionEuro.h"
+
 #include "utility.h"
 #include "rv_library.h"
 
@@ -29,13 +31,13 @@ int main(int argc, char** argv)
     double X = 100;     //option strike
     double T = 1;       //time to maturity
     
-    char o_type = 'b';  // c for plain call, p for plain put
+    //char o_type = 'b';  // c for plain call, p for plain put
                         // a for average rate call, b for average rate put
-                        
-    //double B = 130;     //border price (for border options)
     
     long N = 100;        //time steps
     long M = 1000000;   //Monte Carlo repetitions
+    
+    OptionEuro opt(X, T);
     
     double s_time = std::clock();
     
@@ -53,7 +55,6 @@ int main(int argc, char** argv)
     {
         ut::OutputCounter(j, M, 50000);
         
-        //bool knocked_out = false;
         double path_S = S0;
         double sum = S0;           //to add values of path_S
 
@@ -62,19 +63,14 @@ int main(int argc, char** argv)
             
             path_S = Next_S(path_S, drift_dt, sig_rt);    //update the next value of S
             sum += path_S;
-            /*
-            if(path_S >= B)
-            {
-                knocked_out = true;
-                break;
-            }  
-            */          
+                    
         }
         
         sum /= N;
         
-        double payoff;
+        double payoff = opt.Payoff(path_S);
         
+        /*
         switch(o_type)
         {
             case 'c': payoff = my_max(0.0, path_S - X);    // plain call
@@ -92,8 +88,7 @@ int main(int argc, char** argv)
             default:  ut::OutputLine("Unrecognized option character code");
                       return ut::PauseAndReturn();      
         }
-        
-        //double payoff = knocked_out ? 0.0 : my_max(path_S - X, 0.0);  // barrier
+        */
         
         sum_payoff += payoff;
         sum_payoff_2 += payoff*payoff;
@@ -120,15 +115,6 @@ double Next_S(double S, double drift, double sig)
 {
     double w = rv::GetNormalVariate();    //a random number from out normal distribution
     return S*std::exp(drift + sig*w);
-}
-
-//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-//  my_max()
-//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
-double my_max(double a, double b)
-{
-    return (a < b) ? b : a;
 }
 
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
