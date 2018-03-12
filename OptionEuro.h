@@ -5,10 +5,12 @@
 #define OptionEuroH
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
+class Input;
+
 class OptionEuro
 {
     public:
-        OptionEuro(double X, double T);
+        OptionEuro(const Input & inp);
         
         double GetT() {return T_;}
         

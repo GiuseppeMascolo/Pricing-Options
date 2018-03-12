@@ -2,6 +2,7 @@
 //  MC_plain
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
+#include "Input.h"
 #include "OptionEuro.h"
 
 #include "utility.h"
@@ -24,20 +25,20 @@ double my_max(double, double);
 
 int main(int argc, char** argv)
 {
+    Input inp;
+    OptionEuro opt(inp);
+    
     double S0 = 100;    //intial stock price
     double r = 0.05;    //risk-free rate
     double sig = 0.2;   //volatility
     
-    double X = 100;     //option strike
-    double T = 1;       //time to maturity
+    double T = opt.getT();       //time to maturity
     
     //char o_type = 'b';  // c for plain call, p for plain put
                         // a for average rate call, b for average rate put
     
     long N = 100;        //time steps
     long M = 1000000;   //Monte Carlo repetitions
-    
-    OptionEuro opt(X, T);
     
     double s_time = std::clock();
     

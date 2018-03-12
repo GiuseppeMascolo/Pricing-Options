@@ -1,21 +1,27 @@
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-//  OptionEuro.cpp
+//  Input.cpp
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-#include "OptionEuro.h"
 #include "Input.h"
 
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 // functionality
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-OptionEuro::OptionEuro(const Input & inp)
-:  X_(inp.GetX()), T_(inp.GetT())
-{}
-
-double OptionEuro::Payoff(double S)
+Input::Input()
 {
-    return (S >= X_) ? S - X_ : 0.0;    
+    S0_ = 100;    //intial stock price
+    r_ = 0.05;    //risk-free rate
+    sig_ = 0.2;   //volatility
+    
+    X_ = 100;     //option strike
+    T_ = 1;       //time to maturity
+    
+    //o_type_ = 'b';  // c for plain call, p for plain put
+                        // a for average rate call, b for average rate put
+    
+    N_ = 52;        //time steps
+    M_ = 100000;   //Monte Carlo repetitions
 }
 
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
