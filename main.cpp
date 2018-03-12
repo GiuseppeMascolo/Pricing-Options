@@ -28,40 +28,44 @@ int main(int argc, char** argv)
     
     double X = 100;     //option strike
     double T = 1;       //time to maturity
-    double B = 130;     //border price (for border options)
+    //double B = 130;     //border price (for border options)
     
     long N = 52;        //time steps
     long M = 1000000;   //Monte Carlo repetitions
     
     double s_time = std::clock();
     
-    double dt = T/N;    //time step       
-    double drift_dt = (r - 0.5*sig*sig)*dt;    
-    double sig_rt = sig*std::sqrt(dt);
+    double dt = T/N;                           //time step       
+    double drift_dt = (r - 0.5*sig*sig)*dt;    //drift
+    double sig_rt = sig*std::sqrt(dt);         //vol term
     
     double discount = std::exp(-r*T);  //discount factor to discount the option
     
     double sum_v = 0.0;    //to add on the option payoffs
     double sum_v_2 = 0.0;
     
-    for(long j = 0; j != M; ++j)    //for each repetition
+    for(long j = 0; j != M; ++j)    //for each path
     {
-        if(0 == j % 50000) ut::OutputLine("...", j);
+        ut::OutputCounter(j, M, 50000);
         
-        bool knocked_out = false;
+        //bool knocked_out = false;
         double path_S = S0;
 
         for(long i = 1; i <= N; ++i)    //for each time step
         {
+            
             path_S = Next_S(path_S, drift_dt, sig_rt);    //update the next value of S
+            /*
             if(path_S >= B)
             {
                 knocked_out = true;
                 break;
-            }            
+            }  
+            */          
         }
-
-        double v = knocked_out ? 0.0 : my_max(path_S - X, 0.0);  //payoff
+        
+        double v = my_max(0.0, path_S - X);
+        //double v = knocked_out ? 0.0 : my_max(path_S - X, 0.0);  //payoff
         
         sum_v += v;
         sum_v_2 += v*v;
@@ -73,7 +77,7 @@ int main(int argc, char** argv)
     
     double e_time = (std::clock() - s_time)/CLOCKS_PER_SEC;
     
-    ut::OutputLine("Option value:  ", c);
+    ut::OutputLine("\nOption value:  ", c);
     ut::OutputLine("se:            ", se);
     ut::OutputLine("time taken:    ", e_time);
     
