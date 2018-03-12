@@ -28,6 +28,10 @@ int main(int argc, char** argv)
     
     double X = 100;     //option strike
     double T = 1;       //time to maturity
+    
+    char o_type = 'b';  // c for plain call, p for plain put
+                        // a for average rate call, b for average rate put
+                        
     //double B = 130;     //border price (for border options)
     
     long N = 100;        //time steps
@@ -69,10 +73,26 @@ int main(int argc, char** argv)
         
         sum /= N;
         
-        //double payoff = my_max(0.0, path_S - X);    // plain call
-        double payoff = my_max(0.0, sum - X);       // average rate call
-        //double payoff = my_max(0.0, X - path_S);    // plain put
-        //double payoff = my_max(0.0, X - sum);       // average rate put
+        double payoff;
+        
+        switch(o_type)
+        {
+            case 'c': payoff = my_max(0.0, path_S - X);    // plain call
+                      break;
+                      
+            case 'p': payoff = my_max(0.0, X - path_S);    // plain put
+                      break;
+            
+            case 'a': payoff = my_max(0.0, sum - X);       // average rate call
+                      break;
+            
+            case 'b': payoff = my_max(0.0, X - sum);       // average rate put
+                      break;
+                      
+            default:  ut::OutputLine("Unrecognized option character code");
+                      return ut::PauseAndReturn();      
+        }
+        
         //double payoff = knocked_out ? 0.0 : my_max(path_S - X, 0.0);  // barrier
         
         sum_payoff += payoff;
